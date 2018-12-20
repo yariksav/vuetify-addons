@@ -1,0 +1,31 @@
+{
+  "name": "vuetify-addons",
+  "version": "0.0.1-alpha",
+  "description": "",
+  "main": "dist/vuetify-addons.umd.js",
+  "module": "dist/vuetify-addons.esm.js",
+  "unpkg": "dist/vuetify-addons.min.js",
+  "files": [
+    "dist/*",
+    "src/*",
+    "!src/lib-dev.vue"
+  ],
+  "scripts": {
+    "build": "npm run build:unpkg & npm run build:es & npm run build:umd && npm run copy1",
+    "copy1": "cp -r dist/ ../../cmpact/billing-front/node_modules/vuetify-addons/dist/",
+    "build:umd": "rollup --config build/rollup.config.js --format umd --file dist/vuetify-addons.umd.js",
+    "build:es": "rollup --config build/rollup.config.js --format es --file dist/vuetify-addons.esm.js",
+    "build:unpkg": "rollup --config build/rollup.config.js --format iife --file dist/vuetify-addons.min.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "minimist": "^1.2.0",
+    "rollup": "^0.66.2",
+    "rollup-plugin-buble": "^0.19.2",
+    "rollup-plugin-uglify-es": "0.0.1",
+    "rollup-plugin-vue": "^4.3.0",
+    "vue": "^2.5.16",
+    "vue-template-compiler": "^2.5.16",
+    "vuetify": "^1.3.15"
+  }
+}
