@@ -1,6 +1,6 @@
 {
   "name": "vuetify-addons",
-  "version": "0.0.1-alpha",
+  "version": "0.0.2",
   "description": "",
   "main": "dist/vuetify-addons.umd.js",
   "module": "dist/vuetify-addons.esm.js",
@@ -11,11 +11,12 @@
     "!src/lib-dev.vue"
   ],
   "scripts": {
-    "build": "npm run build:unpkg & npm run build:es & npm run build:umd && npm run copy1",
-    "copy1": "cp -r dist/ ../../cmpact/billing-front/node_modules/vuetify-addons/dist/",
+    "build": "npm run build:unpkg & npm run build:es & npm run build:umd",
+    "build:copy": "npm run build && bash build/copy.sh",
     "build:umd": "rollup --config build/rollup.config.js --format umd --file dist/vuetify-addons.umd.js",
     "build:es": "rollup --config build/rollup.config.js --format es --file dist/vuetify-addons.esm.js",
-    "build:unpkg": "rollup --config build/rollup.config.js --format iife --file dist/vuetify-addons.min.js"
+    "build:unpkg": "rollup --config build/rollup.config.js --format iife --file dist/vuetify-addons.min.js",
+    "prepublish": "npm run build"
   },
   "dependencies": {},
   "devDependencies": {

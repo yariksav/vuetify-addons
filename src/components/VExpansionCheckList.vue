@@ -1,27 +1,27 @@
 <template>
-  <v-expansion-panel>
-    <v-expansion-panel-content v-for="(item ,index) in data" :key="index">
-      <div slot="header">
+  <v-expansion-panels>
+    <v-expansion-panel v-for="(item ,index) in data" :key="index">
+      <v-expansion-panel-header>
         <v-layout>
-          <span class="subheading">{{ item.text }}</span>
+          {{ item.text }}
           <v-spacer/>
           {{ getSelectedOf(item.children).length }} / {{ item.children.length }}
         </v-layout>
-      </div>
-      <v-container pt-0>
-        <span v-for="(child, key) in item.children" :key="key">
-          <v-checkbox
-            v-model="val"
-            :value="child.value"
-            :disabled="disabled"
-            :label="child.texts ? child.texts.join(' - ') : child.text"
-            hide-details
-            class="mt-2"
-          />
-        </span>
-      </v-container>
-    </v-expansion-panel-content>
-  </v-expansion-panel>
+      </v-expansion-panel-header>
+      <v-expansion-panel-content>
+          <span v-for="(child, key) in item.children" :key="key">
+            <v-checkbox
+              v-model="val"
+              :value="child.value"
+              :disabled="disabled"
+              :label="child.texts ? child.texts.join(' - ') : child.text"
+              hide-details
+              class="mt-2"
+            />
+          </span>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+  </v-expansion-panels>
 </template>
 
 <script>
