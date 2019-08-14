@@ -26,8 +26,26 @@
 
 <script>
 import itemable from '../mixins/itemable'
+import {
+  VExpansionPanels,
+  VExpansionPanel,
+  VExpansionPanelHeader,
+  VExpansionPanelContent,
+  VLayout,
+  VSpacer,
+  VCheckbox
+} from 'vuetify/lib'
 
 export default {
+  components: {
+    VExpansionPanels,
+    VExpansionPanel,
+    VExpansionPanelHeader,
+    VExpansionPanelContent,
+    VLayout,
+    VSpacer,
+    VCheckbox 
+  },
   name: 'VExpansionCheckList',
   mixins: [ itemable ],
   props: {

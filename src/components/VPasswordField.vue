@@ -12,7 +12,12 @@
 </template>
 
 <script>
+import { VTextField } from 'vuetify/lib'
+
 export default {
+  components: {
+    VTextField
+  },
   name: 'VPasswordField',
   props: {
     value: String,

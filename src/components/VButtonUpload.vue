@@ -9,7 +9,12 @@
 </template>
 
 <script>
+import { VBtn } from 'vuetify/lib'
+
 export default {
+  components: {
+    VBtn
+  },
   name: 'VBtnUpload',
   props: {
     multiple: Boolean,

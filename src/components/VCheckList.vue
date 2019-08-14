@@ -13,16 +13,17 @@
           <v-divider/>
         </div>
         <div>
-          <v-checkbox
-            v-for="item in data"
-            v-if="group === item.group || (!group && !item.group)"
-            :key="item.value"
-            v-model="checkValue"
-            :label="item.text"
-            :disabled="disabled"
-            :value="item.value"
-            hide-details
-          />
+          <template v-for="item in data">
+            <v-checkbox
+              v-if="group === item.group || (!group && !item.group)"
+              :key="item.value"
+              v-model="checkValue"
+              :label="item.text"
+              :disabled="disabled"
+              :value="item.value"
+              hide-details
+            />
+          </template>
         </div>
       </div>
     </v-list>
@@ -32,8 +33,16 @@
 
 <script>
 import itemable from '../mixins/itemable'
+import { VLabel, VList, VCheckbox, VDivider, VMessages } from 'vuetify/lib'
 
 export default {
+  components: {
+    VLabel,
+    VList,
+    VCheckbox,
+    VDivider,
+    VMessages
+  },
   name: 'VCheckList',
   mixins: [ itemable ],
   props: {
