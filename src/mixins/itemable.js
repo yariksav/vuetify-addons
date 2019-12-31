@@ -1,16 +1,15 @@
 export default {
   props: {
     items: {
-      type: [ Array ],
+      type: [Array],
       default: () => []
-      // required: true
     },
     itemText: {
-      type: [ String, Function ],
+      type: [String, Function],
       default: 'text'
     },
     itemValue: {
-      type: [ String, Function ],
+      type: [String, Function],
       default: 'value'
     }
   },
