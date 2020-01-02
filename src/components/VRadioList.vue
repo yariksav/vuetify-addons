@@ -7,7 +7,11 @@
         :value="item.value"
         :disabled="item.disabled"
       />
-      <p v-if="item.description" :key="'description_' + item.value">
+      <p v-if="item.description"
+        :style="item.value !== value && 'cursor: pointer; opacity: 0.6;'"
+        :key="'description_' + item.value"
+        @click="selected = item.value"
+      >
         {{ item.description }}
       </p>
     </template>
