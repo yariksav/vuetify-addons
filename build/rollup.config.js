@@ -2,6 +2,7 @@
 import vue from 'rollup-plugin-vue';
 import buble from 'rollup-plugin-buble';
 import uglify from 'rollup-plugin-uglify-es';
+import css from 'rollup-plugin-css-porter';
 import minimist from 'minimist';
 
 const argv = minimist(process.argv.slice(2));
@@ -18,9 +19,10 @@ const config = {
   },
   plugins: [
     vue({
-      css: true,
+      css: false,
       compileTemplate: true,
     }),
+    css({ dest: 'dist/vuetify-addons.css' }),
     buble({
       objectAssign: 'Object.assign'
     }),

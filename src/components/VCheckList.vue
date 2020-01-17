@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="VCheckList">
     <v-label v-if="label"
       :focused="errorMessages"
       :color="errorMessages && 'error'"
@@ -82,12 +82,14 @@ export default {
   }
 }
 </script>
-<style>
- .v-checkbox--group-caption {
-    text-align: right;
-    color: #9e9e9e;
-  }
-  .v-checklist .v-input.v-input--checkbox {
-    margin-top: 0;
+<style lang="sass">
+  .VCheckList {
+    .v-checkbox--group-caption {
+      text-align: right;
+      color: #9e9e9e;
+    }
+    .v-checklist .v-input.v-input--checkbox {
+      margin-top: 0;
+    }
   }
 </style>
