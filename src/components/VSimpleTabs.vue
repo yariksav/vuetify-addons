@@ -9,7 +9,7 @@
       :key="key"
       :href="item.href"
     >
-      <v-icon v-if="item.icon">
+      <v-icon v-if="item.icon" left>
         {{ item.icon }}
       </v-icon>
       <span v-if="item.text">
@@ -56,7 +56,8 @@ export default {
       type: Object,
       required: true,
       default: () => ({})
-    }
+    },
+    value: String
   },
   data () {
     return {
@@ -72,13 +73,22 @@ export default {
         }
       }
       return res
+    },
+    tabsKeys () {
+      return Object.keys(this.tabs)
     }
   },
   watch: {
     tab (val) {
-      const key = Object.keys(this.tabs)[val]
-      this.$emit('change', { key, ...this.items[key] })
-    }
+      const key = this.tabsKeys[val]
+      this.$emit('input', key)
+    },
+    value: {
+      immediate: true,
+      handler (val) {
+        this.tab = val ? this.tabsKeys.indexOf(val) : this.tabsKeys[0]
+      }
+    } 
   }
 }
 </script>
