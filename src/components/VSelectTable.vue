@@ -5,7 +5,8 @@
       :headers="computedHeaders"
       :items="items"
       :item-key="itemValue"
-      hide-default-footer
+      :hide-default-footer="!pagination"
+      :disable-pagination="!pagination"
       show-select
       v-bind="$attrs"
     />
@@ -25,6 +26,7 @@ export default {
     label: String,
     items: Array,
     value: Array,
+    pagination: Boolean,
     itemText: {
       type: String,
       default: 'text'
