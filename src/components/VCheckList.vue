@@ -19,6 +19,7 @@
               :key="item.value"
               v-model="checkValue"
               :label="item.text"
+              :prepend-icon="item.icon"
               :disabled="disabled"
               :value="item.value"
               hide-details
@@ -73,10 +74,9 @@ export default {
   },
   methods: {
     getOtherValues (item) {
-      if (this.itemGroup) {
-        return {
-          group: this.getItemValue(item, this.itemGroup)
-        }
+      return {
+        group: this.itemGroup && this.getItemValue(item, this.itemGroup),
+        icon: item.icon
       }
     }
   }

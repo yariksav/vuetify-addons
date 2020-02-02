@@ -9,7 +9,12 @@
       :key="key"
       :href="item.href"
     >
-      <v-icon v-if="item.icon" left>
+      <v-icon
+        v-if="item.icon"
+        left
+        style="max-width: 24px"
+        :color="item.color"
+      >
         {{ item.icon }}
       </v-icon>
       <span v-if="item.text">
