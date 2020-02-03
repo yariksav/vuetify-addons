@@ -17,12 +17,14 @@
         @click:close="remove(item)"
       >
         <slot name="item" :item="computedItems[item]">
+          <v-icon v-if="computedItems[item].icon" left>{{ computedItems[item].icon }}</v-icon>
           {{ computedItems[item].name }}
         </slot>
       </v-chip>
     </template>
     <template v-slot:item="{ item }">
       <slot name="item" :item="item">
+        <v-icon v-if="item.icon" left>{{ item.icon }}</v-icon>
         {{ item.name }}
       </slot>
     </template>
@@ -33,13 +35,15 @@
 
 import {
   VCombobox,
-  VChip
+  VChip,
+  VIcon
 } from 'vuetify/lib'
 
 export default {
   components: {
     VCombobox,
-    VChip
+    VChip,
+    VIcon
   },
   props: {
     items: Array,
