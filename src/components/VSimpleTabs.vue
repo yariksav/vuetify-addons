@@ -29,7 +29,7 @@
         flat
         tile
       >
-        <slot :name="'item.' + key" />
+        <slot :name="key" />
       </v-card>
     </v-tab-item>
   </v-tabs>

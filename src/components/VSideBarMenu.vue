@@ -162,7 +162,7 @@ export default {
     }
     &_Body {
       flex: 1;
-      overflow-y: scroll;
+      overflow-y: auto;
       &::-webkit-scrollbar {
         width: px;
       }
