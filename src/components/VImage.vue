@@ -21,17 +21,16 @@
 
 <script>
 
-// import imageable from './imageable'
 import { VImg, VIcon } from 'vuetify/lib'
 
 export default {
-  // mixins: [imageable],
   components: {
     VImg,
     VIcon
   },
   props: {
     src: [String, Object],
+    value: String,
     lazySrc: String,
     path: String,
     noImage: String,
@@ -50,7 +49,7 @@ export default {
     src: {
       immediate: true,
       handler (val) {
-        this.currentSrc = val
+        this.currentSrc = val || this.value
       }
     }
   },
