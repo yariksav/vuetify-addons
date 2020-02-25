@@ -14,7 +14,8 @@
           <v-window v-model="step">
             <v-window-item :value="1">
               <template v-for="(item, i) in items">
-                <v-list-item v-if="getParam(item.visible, null, true)" :key="i" class="SideBarMenu_MenuItem" @click="select(item)">
+                <v-divider v-if="item.divider" :key="i"/>
+                <v-list-item v-else-if="getParam(item.visible, null, true)" :key="i" class="SideBarMenu_MenuItem" @click="onItemClick(item)">
                   <v-icon v-if="item.icon" small left class="mr-2">
                     {{ item.icon }}
                   </v-icon>
@@ -41,11 +42,11 @@
                 <v-list-item disabled dense class="caption">
                   {{ selectedItem.text }}
                 </v-list-item>
-                <v-list-item v-for="(subItem, i) in selectedItem.children" :key="i" :to="subItem.href">
+                <v-list-item v-for="(subItem, i) in selectedItem.children" :key="i" @click="onItemClick(subItem)">
                   <v-icon v-if="subItem.icon" left>
                     {{ subItem.icon }}
                   </v-icon>
-                  <div role="button" @click="select(subItem)">
+                  <div role="button">
                     {{ subItem.text }}
                   </div>
                 </v-list-item>
@@ -63,6 +64,7 @@
 
 <script>
 import {
+  VDivider,
   VWindow,
   VWindowItem,
   VIcon,
@@ -74,6 +76,7 @@ import {
 
 export default {
   components: {
+    VDivider,
     VWindow,
     VWindowItem,
     VIcon,
@@ -126,14 +129,18 @@ export default {
         }
       })
     },
-    select (item) {
+    onItemClick (item) {
       if (item.children) {
         this.step++
         this.selectedItem = item
-      }
-      item.href && this.$router.push(item.href)
-      if (typeof item.handler === 'function') {
-        item.handler()
+      } else {
+        this.$emit('select', item)
+        if (typeof item.handler === 'function') {
+          item.handler()
+        }
+        if (item.href) {
+          item.href && this.$router.push(item.href)
+        }
       }
     },
     onNavigationDrawerChange () {

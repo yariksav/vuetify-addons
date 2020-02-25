@@ -49,7 +49,7 @@ export default {
     src: {
       immediate: true,
       handler (val) {
-        this.currentSrc = val || this.value
+        this.currentSrc = val || this.value || ''
       }
     }
   },
