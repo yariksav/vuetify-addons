@@ -1,65 +1,109 @@
 <template>
-  <div class="SideBarMenu">
-    <v-navigation-drawer
-      v-model="drawer"
-      class="SideBarMenu_Drawer"
-      app
-      clipped
-      v-bind="$attrs"
-    >
-      <slot slot="prepend" name="prepend" />
-      <slot slot="append" name="append" />
-      <v-list class="SideBarMenu_Body">
-        <v-list-item-group>
-          <v-window v-model="step">
-            <v-window-item :value="1">
-              <template v-for="(item, i) in items">
-                <v-divider v-if="item.divider" :key="i"/>
-                <v-list-item v-else-if="getParam(item.visible, null, true)" :key="i" class="SideBarMenu_MenuItem" @click="onItemClick(item)">
-                  <v-icon v-if="item.icon" small left class="mr-2">
-                    {{ item.icon }}
-                  </v-icon>
-                  <div v-if="item.href" role="button">
-                    {{ item.text }}
-                  </div>
-                  <template v-else>
-                    {{ item.text }}
-                  </template>
-                  <v-icon v-if="item.children && item.children.length" right class="icon-right">
-                    chevron_right
-                  </v-icon>
-                </v-list-item>
-              </template>
-            </v-window-item>
-            <v-window-item :value="2">
-              <v-list>
-                <v-list-item class="SideBarMenu_MenuItem" @click="step--">
-                  <v-icon left class="icon-left">
-                    chevron_left
-                  </v-icon>
-                  {{ backText || 'Main menu' }}
-                </v-list-item>
-                <v-list-item disabled dense class="caption">
-                  {{ selectedItem.text }}
-                </v-list-item>
-                <v-list-item v-for="(subItem, i) in selectedItem.children" :key="i" @click="onItemClick(subItem)">
-                  <v-icon v-if="subItem.icon" left>
-                    {{ subItem.icon }}
-                  </v-icon>
-                  <div role="button">
-                    {{ subItem.text }}
-                  </div>
-                </v-list-item>
-              </v-list>
-            </v-window-item>
-          </v-window>
-        </v-list-item-group>
-      </v-list>
-      <div v-if="$slots.footer" class="SideBarMenu_Footer">
-        <slot name="footer" />
-      </div>
-    </v-navigation-drawer>
-  </div>
+  <v-navigation-drawer
+    v-model="drawer"
+    class="VSideBarMenu"
+    app
+    clipped
+    :permanent="mini"
+    :mini-variant="mini"
+    v-bind="$attrs"
+  >
+    <slot slot="prepend" name="prepend" />
+    <slot name="append" slot="append" >
+      <!-- <v-list dense> -->
+        <VNavListItem
+          :icon="mini && icons.expand"
+          :icon-right="!mini && icons.collapse"
+          :text="labels && labels.collapse"
+          @click="toggleMini"
+        />
+      <!-- </v-list> -->
+    </slot>
+
+    <v-list class="VSideBarMenu_Body v-list-group">
+      <v-list-item-group>
+      <v-window v-if="!mini" v-model="step">
+        <v-window-item :value="1">
+          <template v-for="(item, i) in items">
+            <v-divider v-if="item.divider" :key="'divider-' + i"/>
+            <VNavListItem
+              v-else-if="getParam(item.visible, null, true)"
+              :key="i"
+              class="VSideBarMenu_AminateIconRight"
+              :icon="item.icon"
+              :icon-right="item.children && item.children.length && icons.next"
+              :text="item.text"
+              :children="item.children"
+              :button="Boolean(item.href)"
+              @click="onItemClick(item)"
+            />
+          </template>
+        </v-window-item>
+
+        <v-window-item :value="2">
+          <VNavListItem
+            class="VSideBarMenu_AminateIconLeft"
+            :icon="icons.back"
+            :text="labels && labels.back"
+            @click="step--"
+          />
+
+          <div v-if="selectedItem.text"
+            class="caption VSideBarMenu_Description">
+            {{ selectedItem.text }}
+          </div>
+
+          <template v-for="(subItem, i) in selectedItem.children">
+            <VNavListItem
+              v-if="getParam(subItem.visible, null, true)"
+              :key="i"
+              :icon="subItem.icon"
+              :text="subItem.text"
+              @click="onItemClick(subItem)"
+            />
+          </template>
+        </v-window-item>
+      </v-window>
+      
+
+      <template v-else v-for="(item, i) in items">
+        <v-divider v-if="item.divider" :key="'divider-' + i"/>
+        <v-menu
+          v-else-if="getParam(item.visible, null, true)"
+          :key="i"
+          open-on-hover
+          close-on-click
+          :close-delay="50"
+          close-on-content-click
+          offset-x
+          :disabled="!item.children || !item.children.length"
+        >
+          <template v-slot:activator="{ on }">
+            <VNavListItem
+              :icon="item.icon"
+              @click="onItemClick(item)"
+              v-on="on"
+            />
+          </template>
+          <v-list>
+            <div v-if="item.text" class="caption VSideBarMenu_Description">
+              {{ item.text }}
+            </div>
+            <template v-for="(subItem, i) in item.children">
+              <VNavListItem
+                v-if="getParam(subItem.visible, null, true)"
+                :key="i"
+                :icon="subItem.icon"
+                :text="subItem.text"
+                @click="onItemClick(subItem)"
+              />
+            </template>
+          </v-list>
+        </v-menu>
+      </template>
+      </v-list-item-group>
+    </v-list>
+  </v-navigation-drawer>
 </template>
 
 <script>
@@ -69,10 +113,15 @@ import {
   VWindowItem,
   VIcon,
   VList,
+  VMenu,
   VListItem,
+  VListItemIcon,
+  VListItemTitle,
+  VListItemAction,
   VListItemGroup,
   VNavigationDrawer
 } from 'vuetify/lib'
+import VNavListItem from './VNavListItem.vue'
 
 export default {
   components: {
@@ -81,9 +130,14 @@ export default {
     VWindowItem,
     VIcon,
     VList,
+    VMenu,
     VListItem,
+    VListItemIcon,
+    VListItemTitle,
+    VListItemAction,
     VListItemGroup,
-    VNavigationDrawer
+    VNavigationDrawer,
+    VNavListItem
   },
   props: {
     items: Array,
@@ -91,14 +145,32 @@ export default {
       type: Boolean,
       default: null
     },
+    labels: {
+      type: Object,
+      default: () => ({
+        back: 'Main menu',
+        collapse: 'Collapse panel'
+      })
+    },
+    icons: {
+      type: Object,
+      default: () => ({
+        collapse: 'first_page',
+        expand: 'last_page',
+        back: 'chevron_left',
+        next: 'chevron_right'
+      })
+    },
     useState: Boolean,
-    backText: String
+    backText: String,
+    miniVariant: Boolean
   },
   data () {
     return {
       selectedItem: {},
       step: 1,
-      drawer: this.value
+      drawer: this.value,
+      mini: null
     }
   },
   watch: {
@@ -107,6 +179,12 @@ export default {
     },
     drawer (val) {
       this.$emit('input', val)
+    },
+    miniVariant: {
+      immediate: true,
+      handler (val) {
+        this.mini = true
+      }
     }
   },
   created () {
@@ -154,56 +232,55 @@ export default {
         return param(item)
       }
       return param
+    },
+    toggleMini () {
+      this.mini = !this.mini
+      this.$emit('update:miniVariant', this.mini)
+      if (!this.mini) {
+        this.$nextTick(() => this.drawer = true)
+      }
     }
   }
 }
 </script>
 
 <style lang="scss">
-  .SideBarMenu {
-    &_Drawer {
-      .v-navigation-drawer__content {
-        display: flex;
-        flex-direction: column;
+  .VSideBarMenu {
+    .v-icon {
+      // max-width: 24px!important;
+      &.icon-right {
+          opacity: 0.8;
       }
     }
     &_Body {
       flex: 1;
       overflow-y: auto;
       &::-webkit-scrollbar {
-        width: px;
+        width: 4px;
       }
       &::-webkit-scrollbar-thumb {
-        border-radius: 3px;
+        border-radius: 2px;
         background-color: darkgrey;
       }
     }
-    &_MenuItem {
-       .v-icon.icon-right {
-         opacity: 0;
-       }
-      &:hover {
-        .v-icon.icon-left {
-          transform: translateX(-5px);
-          transition: transform .5s,-webkit-transform .5s;
-        }
-        .v-icon.icon-right {
-          opacity: 1;
-          animation: opacity1 1s;
-          transform: translateX(5px);
-          transition: transform .5s,-webkit-transform .5s;
-        }
+    &_Description {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+      margin-bottom: -4px;
+      opacity: 0.8;
+    }
+    &_AminateIconLeft:hover {
+      .v-icon.icon-left {
+        transform: translateX(-5px);
+        transition: transform .5s,-webkit-transform .5s;
       }
     }
-    // &_Header {
-    //   padding: 12px 16px;
-    //   color: rgb(230, 223, 223);
-    //   flex-shrink: 0;
-    // }
-    // &_Footer {
-    //   padding: 12px 16px;
-    //   color: rgb(230, 223, 223);
-    //   flex-shrink: 0;
-    // }
+    &_AminateIconRight:hover {
+      .v-icon.icon-right {
+        transform: translateX(5px);
+        transition: transform .5s,-webkit-transform .5s;
+      }
+    }
   }
 </style>

@@ -11,7 +11,7 @@
   />
   <v-icon
     v-else-if="icons[value]"
-    small
+    :small="small"
     :color="colors[value]"
   >
     {{ icons[value] }}
@@ -26,6 +26,7 @@ export default {
   },
   props: {
     editable: Boolean,
+    small: Boolean,
     value: [Boolean, Number, String],
     icons: {
       type: Object,
