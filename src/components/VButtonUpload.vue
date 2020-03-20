@@ -35,7 +35,6 @@ export default {
       input.click()
     },
     onFilesSelected (files) {
-      // console.log(files.target.files)
       this.file = files.target.files[0]
       if (this.file) {
         var reader = new FileReader()

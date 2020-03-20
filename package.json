@@ -1,6 +1,6 @@
 {
   "name": "vuetify-addons",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "",
   "main": "dist/vuetify-addons.umd.js",
   "module": "dist/vuetify-addons.esm.js",
