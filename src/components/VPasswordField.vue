@@ -2,6 +2,7 @@
   <VTextField
     ref="input"
     :type="passwordVisibility ? 'text' : 'password'"
+    :value="value"
     v-bind="$attrs"
     v-on="$listeners"
   >

@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 export { default as VActiveStatus } from './VActiveStatus.vue'
+export { default as VActiveIcon } from './VActiveIcon.vue'
 export { default as VAutocompleteField } from './VAutocompleteField.vue'
 export { default as VButtonToggle } from './VButtonToggle.vue'
 export { default as VButtonUpload } from './VButtonUpload.vue'

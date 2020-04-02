@@ -10,18 +10,15 @@
   >
     <slot slot="prepend" name="prepend" />
     <slot name="append" slot="append" >
-      <!-- <v-list dense> -->
-        <VNavListItem
-          :icon="mini && icons.expand"
-          :icon-right="!mini && icons.collapse"
-          :text="labels && labels.collapse"
-          @click="toggleMini"
-        />
-      <!-- </v-list> -->
+      <VNavListItem
+        :icon="mini && icons.expand"
+        :icon-right="!mini && icons.collapse"
+        :text="labels && labels.collapse"
+        @click="toggleMini"
+      />
     </slot>
-
     <v-list class="VSideBarMenu_Body v-list-group">
-      <v-list-item-group>
+      <v-list-item-group v-model="activeItem" mandatory>
       <v-window v-if="!mini" v-model="step">
         <v-window-item :value="1">
           <template v-for="(item, i) in items">
@@ -59,12 +56,12 @@
               :key="i"
               :icon="subItem.icon"
               :text="subItem.text"
+              :active="$route && $route.path.endsWith(subItem.href)"
               @click="onItemClick(subItem)"
             />
           </template>
         </v-window-item>
       </v-window>
-      
 
       <template v-else v-for="(item, i) in items">
         <v-divider v-if="item.divider" :key="'divider-' + i"/>
@@ -95,6 +92,7 @@
                 :key="i"
                 :icon="subItem.icon"
                 :text="subItem.text"
+                :active="$route && $route.path.endsWith(subItem.href)"
                 @click="onItemClick(subItem)"
               />
             </template>
@@ -163,14 +161,16 @@ export default {
     },
     useState: Boolean,
     backText: String,
-    miniVariant: Boolean
+    miniVariant: Boolean,
+    prepareHref: Function
   },
   data () {
     return {
       selectedItem: {},
       step: 1,
       drawer: this.value,
-      mini: null
+      mini: null,
+      activeItem: null
     }
   },
   watch: {
@@ -183,7 +183,7 @@ export default {
     miniVariant: {
       immediate: true,
       handler (val) {
-        this.mini = true
+        this.mini = val
       }
     }
   },
@@ -199,8 +199,9 @@ export default {
       return items.find((item) => {
         if (item.href && this.$route.path.endsWith(item.href)) {
           this.selectedItem = parent || item
+          this.activeItem = this.items.indexOf(this.selectedItem)
           this.step = parent ? 2 : 1
-          return true
+          return this.selectedItem
         }
         if (item.children) {
           return this.findActiveItem(item.children, item)
@@ -213,11 +214,8 @@ export default {
         this.selectedItem = item
       } else {
         this.$emit('select', item)
-        if (typeof item.handler === 'function') {
-          item.handler()
-        }
         if (item.href) {
-          item.href && this.$router.push(item.href)
+          this.$router.push(this.prepareHref ? this.prepareHref(item.href) : item.href)
         }
       }
     },
@@ -247,11 +245,13 @@ export default {
 <style lang="scss">
   .VSideBarMenu {
     .v-icon {
-      // max-width: 24px!important;
       &.icon-right {
           opacity: 0.8;
       }
     }
+    // .v-list-item--active {
+    //   var(--v-warning-base);
+    // }
     &_Body {
       flex: 1;
       overflow-y: auto;

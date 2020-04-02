@@ -31,8 +31,8 @@ export default {
     icons: {
       type: Object,
       default: () => ({
-        true: 'visibility',
-        false: 'visibility_off'
+        true: 'radio_button_checked',
+        false: 'radio_button_unchecked'
       })
     },
     colors: {

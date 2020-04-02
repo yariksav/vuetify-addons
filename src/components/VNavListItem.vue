@@ -3,6 +3,7 @@
     v-bind="$attrs"
     v-on="$listeners"
     class="VNavLsitItem"
+    :class="{ [activeClass]: active }"
   >
     <v-list-item-icon v-if="icon" link class="mr-4">
       <v-icon class="icon-left" v-text="icon" />
@@ -38,7 +39,12 @@ export default {
     icon: [Boolean, String],
     iconRight: [Boolean, String],
     text: String,
-    button: Boolean
+    button: Boolean,
+    active: Boolean,
+    activeClass: {
+      type: String,
+      default: 'deep-purple--text text--accent-4'
+    }
   },
   data () {
     return {
