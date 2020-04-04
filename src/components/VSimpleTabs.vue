@@ -25,12 +25,9 @@
       v-for="(item, key) in tabs"
       :key="key"
     >
-      <v-card
-        flat
-        tile
-      >
+      <v-sheet>
         <slot :name="key" />
-      </v-card>
+      </v-sheet>
     </v-tab-item>
   </v-tabs>
 </template>
@@ -43,7 +40,7 @@ import {
   VIcon,
   VTabsItems,
   VTabItem,
-  VCard
+  VSheet
 } from 'vuetify/lib'
 
 export default {
@@ -54,7 +51,7 @@ export default {
     VIcon,
     VTabsItems,
     VTabItem,
-    VCard
+    VSheet
   },
   props: {
     items: {
