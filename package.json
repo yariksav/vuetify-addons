@@ -1,6 +1,6 @@
 {
   "name": "vuetify-addons",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "",
   "main": "dist/vuetify-addons.umd.js",
   "module": "dist/vuetify-addons.esm.js",
@@ -20,8 +20,8 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "minimist": "^1.2.0",
-    "node-sass": "^4.13.0",
+    "minimist": "^1.2.5",
+    "node-sass": "^4.13.1",
     "rollup": "^0.66.2",
     "rollup-plugin-buble": "^0.19.2",
     "rollup-plugin-css-porter": "^1.0.2",

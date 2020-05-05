@@ -8,16 +8,17 @@
       v-for="(item, key) in tabs"
       :key="key"
       :href="item.href"
+      :title="hideLabels && item.text"
     >
       <v-icon
         v-if="item.icon"
-        left
+        :left="Boolean(item.text && !hideLabels)"
         style="max-width: 24px"
         :color="item.color"
       >
         {{ item.icon }}
       </v-icon>
-      <span v-if="item.text">
+      <span v-if="item.text && !hideLabels">
         {{ item.text }}
       </span>
     </v-tab>
@@ -59,7 +60,8 @@ export default {
       required: true,
       default: () => ({})
     },
-    value: String
+    value: String,
+    hideLabels: Boolean
   },
   data () {
     return {
