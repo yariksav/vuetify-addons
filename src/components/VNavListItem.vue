@@ -3,12 +3,14 @@
     v-bind="$attrs"
     v-on="$listeners"
     class="VNavLsitItem"
-    :class="{ [activeClass]: active }"
+    :link="!!href"
+    :to="href"
+    :class="active ? 'v-list-item--active' : ''"
   >
     <v-list-item-icon v-if="icon" link class="mr-4">
       <v-icon class="icon-left" v-text="icon" />
     </v-list-item-icon>
-    <v-list-item-title :role="button ? 'button' : null">
+    <v-list-item-title>
       {{ text }}
     </v-list-item-title>
     <v-list-item-action v-if="iconRight">
@@ -37,14 +39,10 @@ export default {
   },
   props: {
     icon: [Boolean, String],
+    href: String,
     iconRight: [Boolean, String],
     text: String,
-    button: Boolean,
-    active: Boolean,
-    activeClass: {
-      type: String,
-      default: 'deep-purple--text text--accent-4'
-    }
+    active: Boolean
   },
   data () {
     return {

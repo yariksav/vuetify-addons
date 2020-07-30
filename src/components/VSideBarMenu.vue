@@ -4,7 +4,7 @@
     class="VSideBarMenu"
     app
     clipped
-    :permanent="mini"
+    :permanent.sync="mini"
     :mini-variant="mini"
     v-bind="$attrs"
   >
@@ -31,6 +31,8 @@
               :icon-right="item.children && item.children.length && icons.next"
               :text="item.text"
               :children="item.children"
+              :active="isActive(item)"
+              :href="prepareLinkHref(item.href)"
               :button="Boolean(item.href)"
               @click="onItemClick(item)"
             />
@@ -41,22 +43,18 @@
           <VNavListItem
             class="VSideBarMenu_AminateIconLeft"
             :icon="icons.back"
-            :text="labels && labels.back"
+            :text="selectedItem.text"
             @click="step--"
           />
-
-          <div v-if="selectedItem.text"
-            class="caption VSideBarMenu_Description">
-            {{ selectedItem.text }}
-          </div>
-
+          <v-divider />
           <template v-for="(subItem, i) in selectedItem.children">
             <VNavListItem
-              v-if="getParam(subItem.visible, null, true)"
+              v-if="getParam(subItem.visible, null, true) && (subItem.text || subItem.icon)"
               :key="i"
               :icon="subItem.icon"
               :text="subItem.text"
-              :active="$route && $route.path.endsWith(subItem.href)"
+              :href="prepareLinkHref(subItem.href)"
+              :active="isActive(subItem)"
               @click="onItemClick(subItem)"
             />
           </template>
@@ -78,6 +76,8 @@
           <template v-slot:activator="{ on }">
             <VNavListItem
               :icon="item.icon"
+              :active="isActive(item)"
+              :href="prepareLinkHref(item.href)"
               @click="onItemClick(item)"
               v-on="on"
             />
@@ -88,11 +88,12 @@
             </div>
             <template v-for="(subItem, i) in item.children">
               <VNavListItem
-                v-if="getParam(subItem.visible, null, true)"
+                v-if="getParam(subItem.visible, null, true) && (subItem.text || subItem.icon)"
                 :key="i"
                 :icon="subItem.icon"
                 :text="subItem.text"
-                :active="$route && $route.path.endsWith(subItem.href)"
+                :active="isActive(subItem)"
+                :href="prepareLinkHref(subItem.href)"
                 @click="onItemClick(subItem)"
               />
             </template>
@@ -139,6 +140,7 @@ export default {
   },
   props: {
     items: Array,
+    routeParams: Array,
     value: {
       type: Boolean,
       default: null
@@ -160,12 +162,12 @@ export default {
       })
     },
     useState: Boolean,
-    backText: String,
     miniVariant: Boolean,
     prepareHref: Function
   },
   data () {
     return {
+      temporary: null,
       selectedItem: {},
       step: 1,
       drawer: this.value,
@@ -195,6 +197,17 @@ export default {
     document.removeEventListener('navigation-drawer', this.onNavigationDrawerChange)
   },
   methods: {
+    prepareLinkHref (href) {
+      return this.prepareHref && href ? this.prepareHref(href) : (href || undefined)
+    },
+    isActive(item) {
+      if (item.children) {
+        return !!item.children.find(i => this.isActiveRoute(i.href))
+      }
+    },
+    isActiveRoute (href) {
+      return href && this.$route.path.includes(href)
+    },
     findActiveItem (items, parent) {
       return items.find((item) => {
         if (item.href && this.$route.path.endsWith(item.href)) {
@@ -212,15 +225,20 @@ export default {
       if (item.children) {
         this.step++
         this.selectedItem = item
-      } else {
-        this.$emit('select', item)
-        if (item.href) {
-          this.$router.push(this.prepareHref ? this.prepareHref(item.href) : item.href)
-        }
       }
+      //  else {
+      //   this.$emit('select', item)
+      //   if (item.href) {
+      //     this.$router.push(this.prepareHref ? this.prepareHref(item.href) : item.href)
+      //   }
+      // }
     },
     onNavigationDrawerChange () {
-      this.drawer = !this.drawer
+      if (this.mini) {
+        this.toggleMini()
+      } else {
+        this.drawer = !this.drawer
+      }
     },
     getParam (param, item, def) {
       if (param === undefined) {

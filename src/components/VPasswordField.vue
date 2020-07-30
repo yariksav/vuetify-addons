@@ -9,8 +9,7 @@
     <template slot="append">
       <v-icon
         role="button"
-        @mousedown.native="passwordVisibility = true"
-        @mouseup.native="passwordVisibility = false"
+        @click="passwordVisibility = !passwordVisibility"
       >
         {{ passwordVisibility ? 'visibility' : 'visibility_off' }}
       </v-icon>
