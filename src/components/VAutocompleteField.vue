@@ -23,6 +23,10 @@
       :error-messages="errors"
       v-bind="$attrs"
     >
+      <slot v-for="slot in Object.keys($slots)" :slot="slot" :name="slot" />
+      <template v-for="slot in Object.keys($scopedSlots)" :slot="slot" slot-scope="scope">
+        <slot :name="slot" v-bind="scope" />
+      </template>
       <div v-if="valueText" slot="append-outer" class="d-flex">
         <v-icon @click="onCancelClick">
           close
@@ -69,7 +73,7 @@ export default {
   },
   data () {
     return {
-      editable: !this.value,
+      editable: !this.value && !this.valueText,
       items: [],
       oldVal: this.value,
       val: this.value,
@@ -86,6 +90,10 @@ export default {
   },
   watch: {
     search: 'debouncedLoadData',
+    valueText (val) {
+      this.valText = val
+      this.editable = false
+    },
     val (val) {
       if (val) {
         this.editable = false
