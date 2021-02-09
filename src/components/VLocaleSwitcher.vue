@@ -1,9 +1,12 @@
 <template>
   <v-menu v-if="availableLocales" offset-y>
     <template #activator="{ on }">
-      <v-btn class="mr-1" text fab small v-on="on">
-        {{ $i18n.locale }}
-      </v-btn>
+      <div v-on="on" role="button">
+        <span v-if="!icon">
+          {{ currentLocaleName }}
+        </span>
+        <v-icon :right="!icon">language</v-icon>
+      </div>
     </template>
     <v-list>
       <v-list-item
@@ -20,20 +23,32 @@
 </template>
 
 <script>
-import { VBtn, VMenu, VList, VListItem, VListItemTitle } from 'vuetify/lib'
+import { VBtn, VMenu, VIcon, VList, VListItem, VListItemTitle } from 'vuetify/lib'
 
 export default {
   components: {
     VBtn,
     VMenu,
+    VIcon,
     VList,
     VListItem,
     VListItemTitle
   },
   props: {
-    reload: Boolean
+    reload: Boolean,
+    icon: Boolean
   },
   computed: {
+    currentLocaleName () {
+      if (!this.$i18n) {
+        return null
+      }
+      if (this.icon) {
+        return this.$i18n.locale
+      }
+      const locale = this.$i18n.locales.find(i => i.code === this.$i18n.locale)
+      return locale ? locale.name : this.$i18n.locale
+    },
     availableLocales () {
       if (!this.$i18n) {
         return null

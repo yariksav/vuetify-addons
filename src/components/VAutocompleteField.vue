@@ -1,39 +1,37 @@
 <template>
-  <div>
-    <v-text-field
-      v-if="!editable"
-      readonly
-      v-bind="$attrs"
-      append-icon="edit"
-      :value="valText"
-      :error-messages="errorMessages"
-      @click:append="onEditClick"
-    />
-    <v-autocomplete
-      v-else
-      ref="autocomplte"
-      v-model="val"
-      :items="items"
-      :loading="loading"
-      :search-input.sync="search"
-      hide-selected
-      :item-text="itemText"
-      :item-value="itemValue"
-      :placeholder="placeholder"
-      :error-messages="errors"
-      v-bind="$attrs"
-    >
-      <slot v-for="slot in Object.keys($slots)" :slot="slot" :name="slot" />
-      <template v-for="slot in Object.keys($scopedSlots)" :slot="slot" slot-scope="scope">
-        <slot :name="slot" v-bind="scope" />
-      </template>
-      <div v-if="valueText" slot="append-outer" class="d-flex">
-        <v-icon @click="onCancelClick">
-          close
-        </v-icon>
-      </div>
-    </v-autocomplete>
-  </div>
+  <v-text-field
+    v-if="!editable"
+    readonly
+    v-bind="$attrs"
+    append-icon="edit"
+    :value="valText"
+    :error-messages="errorMessages"
+    @click:append="onEditClick"
+  />
+  <v-autocomplete
+    v-else
+    ref="autocomplte"
+    v-model="val"
+    :items="items"
+    :loading="loading"
+    :search-input.sync="search"
+    hide-selected
+    :item-text="itemText"
+    :item-value="itemValue"
+    :placeholder="placeholder"
+    :error-messages="errors"
+    v-bind="$attrs"
+  >
+    <slot v-for="slot in Object.keys($slots)" :slot="slot" :name="slot" />
+    <template v-for="slot in Object.keys($scopedSlots)" :slot="slot" slot-scope="scope">
+      <slot :name="slot" v-bind="scope" />
+    </template>
+    <div v-if="valueText" slot="append-outer" class="d-flex">
+      <v-icon @click="onCancelClick">
+        close
+      </v-icon>
+    </div>
+  </v-autocomplete>
 </template>
 
 <script>
@@ -101,6 +99,7 @@ export default {
         if (item) {
           this.valText = item[this.itemText]
           this.$emit('input', val)
+          this.$emit('change', item)
         }
       }
     }
@@ -136,11 +135,12 @@ export default {
       this.loading = true
       this.onLoad({ connector: this.connector, search: this.search }).then(res => {
         this.items = res || []
+        this.loading = false
       }).catch(e => {
         this.error = e.message
         this.onError ? this.onError(e) : console.error(e)
+        this.loading = false
       })
-      this.loading = false
     }
   }
 }

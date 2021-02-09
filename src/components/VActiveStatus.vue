@@ -31,8 +31,8 @@ export default {
     icons: {
       type: Object,
       default: () => ({
-        true: 'radio_button_checked',
-        false: 'radio_button_unchecked'
+        true: 'check_circle_outline',
+        false: 'block'
       })
     },
     colors: {
