@@ -1,11 +1,12 @@
 <template>
   <v-list-item
     v-bind="$attrs"
-    v-on="$listeners"
     class="VNavLsitItem"
-    :link="!!href"
+    :link="Boolean(href)"
     :to="href"
-    :class="active ? 'v-list-item--active' : ''"
+    :inactive="!href"
+    :class="active ? 'v-list-item--active v-list-item--link' : ''"
+    v-on="$listeners"
   >
     <v-list-item-icon v-if="icon" link class="mr-4">
       <v-icon class="icon-left" v-text="icon" />

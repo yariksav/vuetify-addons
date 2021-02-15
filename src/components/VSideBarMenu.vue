@@ -1,105 +1,107 @@
 <template>
   <v-navigation-drawer
     v-model="drawer"
+    v-bind="$attrs"
     class="VSideBarMenu"
     app
     clipped
-    :permanent.sync="mini"
-    :mini-variant="mini"
-    v-bind="$attrs"
+    :mini-variant.sync="mini"
+    :permanent="permanent"
+    disable-route-watcher
   >
-    <slot slot="prepend" name="prepend" />
-    <slot name="append" slot="append" >
+    <slot slot="prepend" name="prepend" :mini="mini" />
+    <slot slot="append" name="append">
       <VNavListItem
+        v-if="!miniVariantDisable"
         :icon="mini && icons.expand"
         :icon-right="!mini && icons.collapse"
-        :text="labels && labels.collapse"
+        :text="collapseLabel"
         @click="toggleMini"
       />
     </slot>
     <v-list class="VSideBarMenu_Body v-list-group">
       <v-list-item-group v-model="activeItem" mandatory>
-      <v-window v-if="!mini" v-model="step">
-        <v-window-item :value="1">
-          <template v-for="(item, i) in items">
-            <v-divider v-if="item.divider" :key="'divider-' + i"/>
-            <VNavListItem
-              v-else-if="getParam(item.visible, null, true)"
-              :key="i"
-              class="VSideBarMenu_AminateIconRight"
-              :icon="item.icon"
-              :icon-right="item.children && item.children.length && icons.next"
-              :text="item.text"
-              :children="item.children"
-              :active="isActive(item)"
-              :href="prepareLinkHref(item.href)"
-              :button="Boolean(item.href)"
-              @click="onItemClick(item)"
-            />
-          </template>
-        </v-window-item>
+        <v-window v-if="!mini" v-model="step">
+          <v-window-item :value="1">
+            <template v-for="(item, i) in items">
+              <v-divider v-if="item.divider" :key="'divider-' + i" />
+              <VNavListItem
+                v-else-if="getParam(item.visible, null, true)"
+                :key="i"
+                class="VSideBarMenu_AminateIconRight"
+                :icon="item.icon"
+                :icon-right="item.children && item.children.length && icons.next"
+                :text="item.text"
+                :children="item.children"
+                :active="isActive(item)"
+                :href="prepareLinkHref(item.href)"
+                :button="Boolean(item.href)"
+                @click="onItemClick(item)"
+              />
+            </template>
+          </v-window-item>
 
-        <v-window-item :value="2">
-          <VNavListItem
-            class="VSideBarMenu_AminateIconLeft"
-            :icon="icons.back"
-            :text="selectedItem.text"
-            @click="step--"
-          />
-          <v-divider />
-          <template v-for="(subItem, i) in selectedItem.children">
+          <v-window-item :value="2">
             <VNavListItem
-              v-if="getParam(subItem.visible, null, true) && (subItem.text || subItem.icon)"
-              :key="i"
-              :icon="subItem.icon"
-              :text="subItem.text"
-              :href="prepareLinkHref(subItem.href)"
-              :active="isActive(subItem)"
-              @click="onItemClick(subItem)"
+              class="VSideBarMenu_AminateIconLeft"
+              :icon="icons.back"
+              :text="selectedItem.text"
+              @click="step--"
             />
-          </template>
-        </v-window-item>
-      </v-window>
-
-      <template v-else v-for="(item, i) in items">
-        <v-divider v-if="item.divider" :key="'divider-' + i"/>
-        <v-menu
-          v-else-if="getParam(item.visible, null, true)"
-          :key="i"
-          open-on-hover
-          close-on-click
-          :close-delay="50"
-          close-on-content-click
-          offset-x
-          :disabled="!item.children || !item.children.length"
-        >
-          <template v-slot:activator="{ on }">
-            <VNavListItem
-              :icon="item.icon"
-              :active="isActive(item)"
-              :href="prepareLinkHref(item.href)"
-              @click="onItemClick(item)"
-              v-on="on"
-            />
-          </template>
-          <v-list>
-            <div v-if="item.text" class="caption VSideBarMenu_Description">
-              {{ item.text }}
-            </div>
-            <template v-for="(subItem, i) in item.children">
+            <v-divider />
+            <template v-for="(subItem, i) in selectedItem.children">
               <VNavListItem
                 v-if="getParam(subItem.visible, null, true) && (subItem.text || subItem.icon)"
                 :key="i"
                 :icon="subItem.icon"
                 :text="subItem.text"
-                :active="isActive(subItem)"
                 :href="prepareLinkHref(subItem.href)"
+                :active="isActive(subItem)"
                 @click="onItemClick(subItem)"
               />
             </template>
-          </v-list>
-        </v-menu>
-      </template>
+          </v-window-item>
+        </v-window>
+
+        <template v-for="(item, i) in items" v-else>
+          <v-divider v-if="item.divider" :key="'divider-' + i" />
+          <v-menu
+            v-else-if="getParam(item.visible, null, true)"
+            :key="i"
+            open-on-hover
+            close-on-click
+            :close-delay="150"
+            close-on-content-click
+            offset-x
+            :disabled="!item.children || !item.children.length"
+          >
+            <template #activator="{ on }">
+              <VNavListItem
+                :icon="item.icon"
+                :active="isActive(item)"
+                :href="prepareLinkHref(item.href)"
+                @click="onItemClick(item)"
+                v-on="on"
+              />
+            </template>
+            <v-list>
+              <div v-if="item.text" class="caption VSideBarMenu_Description">
+                {{ item.text }}
+              </div>
+              <template v-for="(subItem, key) in item.children">
+                <VNavListItem
+                  v-if="getParam(subItem.visible, null, true) && (subItem.text || subItem.icon)"
+                  :key="key"
+                  :icon="subItem.icon"
+                  :text="subItem.text"
+                  :active="isActive(subItem)"
+                  :href="prepareLinkHref(subItem.href)"
+                  @click="onItemClick(subItem)"
+                />
+              </template>
+            </v-list>
+          </v-menu>
+        </template>
       </v-list-item-group>
     </v-list>
   </v-navigation-drawer>
@@ -110,13 +112,8 @@ import {
   VDivider,
   VWindow,
   VWindowItem,
-  VIcon,
   VList,
   VMenu,
-  VListItem,
-  VListItemIcon,
-  VListItemTitle,
-  VListItemAction,
   VListItemGroup,
   VNavigationDrawer
 } from 'vuetify/lib'
@@ -127,31 +124,20 @@ export default {
     VDivider,
     VWindow,
     VWindowItem,
-    VIcon,
     VList,
     VMenu,
-    VListItem,
-    VListItemIcon,
-    VListItemTitle,
-    VListItemAction,
     VListItemGroup,
     VNavigationDrawer,
     VNavListItem
   },
   props: {
     items: Array,
-    routeParams: Array,
+    permanent: Boolean,
     value: {
       type: Boolean,
       default: null
     },
-    labels: {
-      type: Object,
-      default: () => ({
-        back: 'Main menu',
-        collapse: 'Collapse panel'
-      })
-    },
+    collapseLabel: String,
     icons: {
       type: Object,
       default: () => ({
@@ -163,6 +149,7 @@ export default {
     },
     useState: Boolean,
     miniVariant: Boolean,
+    miniVariantDisable: Boolean,
     prepareHref: Function
   },
   data () {
@@ -200,13 +187,13 @@ export default {
     prepareLinkHref (href) {
       return this.prepareHref && href ? this.prepareHref(href) : (href || undefined)
     },
-    isActive(item) {
+    isActive (item) {
       if (item.children) {
         return !!item.children.find(i => this.isActiveRoute(i.href))
       }
     },
     isActiveRoute (href) {
-      return href && this.$route.path.includes(href)
+      return href && (this.$route.path.includes(href))
     },
     findActiveItem (items, parent) {
       return items.find((item) => {
@@ -219,6 +206,7 @@ export default {
         if (item.children) {
           return this.findActiveItem(item.children, item)
         }
+        return null
       })
     },
     onItemClick (item) {
@@ -234,7 +222,11 @@ export default {
       // }
     },
     onNavigationDrawerChange () {
-      if (this.mini) {
+      if (!this.permanent && this.mini) {
+        this.toggleMini()
+        return
+      }
+      if (this.permanent) {
         this.toggleMini()
       } else {
         this.drawer = !this.drawer
@@ -250,10 +242,12 @@ export default {
       return param
     },
     toggleMini () {
-      this.mini = !this.mini
+      this.mini = this.miniVariantDisable ? false : !this.mini
       this.$emit('update:miniVariant', this.mini)
       if (!this.mini) {
-        this.$nextTick(() => this.drawer = true)
+        this.$nextTick(() => {
+          this.drawer = true
+        })
       }
     }
   }
