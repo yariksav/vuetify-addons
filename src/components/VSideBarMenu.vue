@@ -116,7 +116,8 @@ import {
   VList,
   VMenu,
   VListItemGroup,
-  VNavigationDrawer
+  VNavigationDrawer,
+  VSheet
 } from 'vuetify/lib'
 import VNavListItem from './VNavListItem.vue'
 
@@ -129,7 +130,8 @@ export default {
     VMenu,
     VListItemGroup,
     VNavigationDrawer,
-    VNavListItem
+    VNavListItem,
+    VSheet
   },
   props: {
     items: Array,
