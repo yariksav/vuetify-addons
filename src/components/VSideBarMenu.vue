@@ -23,18 +23,20 @@
       <v-list-item-group v-model="activeItem" mandatory>
         <v-window v-if="!mini" v-model="step">
           <v-window-item :value="1">
-            <template v-for="(item, i) in items">
-              <v-divider v-if="item.divider" :key="'divider-' + i" />
+            <template v-for="(item, i) in computedMenu">
+              <v-divider
+                v-if="item.divider"
+                :key="'divider-' + i"
+              />
               <VNavListItem
-                v-else-if="getParam(item.visible, null, true)"
-                :key="i"
+                v-else
+                :key="`item_${i}`"
                 class="VSideBarMenu_AminateIconRight"
-                :icon="item.icon"
                 :icon-right="item.children && item.children.length && icons.next"
+                :icon="item.icon"
                 :text="item.text"
-                :children="item.children"
                 :active="isActive(item)"
-                :href="prepareLinkHref(item.href)"
+                :href="item.href"
                 :button="Boolean(item.href)"
                 @click="onItemClick(item)"
               />
@@ -51,11 +53,8 @@
             <v-divider />
             <template v-for="(subItem, i) in selectedItem.children">
               <VNavListItem
-                v-if="getParam(subItem.visible, null, true) && (subItem.text || subItem.icon)"
-                :key="i"
-                :icon="subItem.icon"
-                :text="subItem.text"
-                :href="prepareLinkHref(subItem.href)"
+                :key="`sitem_${i}`"
+                v-bind="subItem"
                 :active="isActive(subItem)"
                 @click="onItemClick(subItem)"
               />
@@ -63,43 +62,45 @@
           </v-window-item>
         </v-window>
 
-        <template v-for="(item, i) in items" v-else>
-          <v-divider v-if="item.divider" :key="'divider-' + i" />
+        <template v-for="(item, i) in computedMenu" v-else>
+          <v-divider
+            v-if="item.divider"
+            :key="'divider-' + i"
+          />
           <v-menu
-            v-else-if="getParam(item.visible, null, true)"
-            :key="i"
+            v-else
+            :key="`mitem_${i}`"
             open-on-hover
             close-on-click
             :close-delay="150"
+            :min-width="200"
             close-on-content-click
             offset-x
-            :disabled="!item.children || !item.children.length"
           >
             <template #activator="{ on }">
               <VNavListItem
                 :icon="item.icon"
                 :active="isActive(item)"
-                :href="prepareLinkHref(item.href)"
+                :href="item.href"
                 @click="onItemClick(item)"
                 v-on="on"
               />
             </template>
-            <v-list>
-              <div v-if="item.text" class="caption VSideBarMenu_Description">
+            <v-sheet>
+              <div v-if="item.text" class="VSideBarMenu_Description pt-2">
                 {{ item.text }}
               </div>
-              <template v-for="(subItem, key) in item.children">
-                <VNavListItem
-                  v-if="getParam(subItem.visible, null, true) && (subItem.text || subItem.icon)"
-                  :key="key"
-                  :icon="subItem.icon"
-                  :text="subItem.text"
-                  :active="isActive(subItem)"
-                  :href="prepareLinkHref(subItem.href)"
-                  @click="onItemClick(subItem)"
-                />
-              </template>
-            </v-list>
+              <v-list>
+                <template v-for="(subItem, key) in item.children">
+                  <VNavListItem
+                    :key="key"
+                    v-bind="subItem"
+                    :active="isActive(subItem)"
+                    @click="onItemClick(subItem)"
+                  />
+                </template>
+              </v-list>
+            </v-sheet>
           </v-menu>
         </template>
       </v-list-item-group>
@@ -162,6 +163,36 @@ export default {
       activeItem: null
     }
   },
+  computed: {
+    computedMenu () {
+      const computedMenu = (this.items || []).reduce((acc, item) => {
+        const submenus = (item.children || []).reduce((sacc, sitem) => {
+          if (this.getParam(sitem.visible, null, true) && (sitem.text || sitem.icon)) {
+            sacc.push({
+              text: sitem.text,
+              icon: sitem.icon,
+              section: sitem.section,
+              href: this.prepareLinkHref(sitem.href)
+            })
+          }
+          return sacc
+        }, [])
+        if (item.divider) {
+          acc.push(item)
+        } else if (submenus.length && this.getParam(item.visible, null, true)) {
+          acc.push({
+            text: item.text,
+            icon: item.icon,
+            section: item.section,
+            href: this.prepareLinkHref(item.href),
+            children: submenus
+          })
+        }
+        return acc
+      }, [])
+      return computedMenu
+    }
+  },
   watch: {
     value (val) {
       this.drawer = val
@@ -178,7 +209,7 @@ export default {
   },
   created () {
     document.addEventListener('navigation-drawer', this.onNavigationDrawerChange)
-    this.findActiveItem(this.items)
+    this.findActiveItem(this.computedMenu)
   },
   destroyed () {
     document.removeEventListener('navigation-drawer', this.onNavigationDrawerChange)
@@ -199,7 +230,7 @@ export default {
       return items.find((item) => {
         if (item.href && this.$route.path.endsWith(item.href)) {
           this.selectedItem = parent || item
-          this.activeItem = this.items.indexOf(this.selectedItem)
+          this.activeItem = this.computedMenu.indexOf(this.selectedItem)
           this.step = parent ? 2 : 1
           return this.selectedItem
         }
@@ -214,12 +245,6 @@ export default {
         this.step++
         this.selectedItem = item
       }
-      //  else {
-      //   this.$emit('select', item)
-      //   if (item.href) {
-      //     this.$router.push(this.prepareHref ? this.prepareHref(item.href) : item.href)
-      //   }
-      // }
     },
     onNavigationDrawerChange () {
       if (!this.permanent && this.mini) {
