@@ -2,6 +2,7 @@
   <v-chip
     v-bind="$attrs"
     :color="color"
+    :close="close"
     :text-color="computeTextColor"
     v-on="$listeners"
   >
@@ -19,6 +20,7 @@ export default {
     VChip
   },
   props: {
+    close: Boolean,
     color: String,
     threshold: {
       type: Number,
